@@ -1,20 +1,14 @@
-Name: ____________           ID:   ____________
+Name: Hanzhou Tang        ID:   47520711
 
 ## Proposed Project
-
-> Replace this paragraph with the description of what your project
-> will do. Tell me what kind of interface it will have, and roughly
-> how it will work. I don't need more than three or four sentences,
-> unless you feel compelled to write more.
+I want to create a multiplayer game system. It will contain a website, a central server and a database.
+The games (such as chess, go, painting, or simple chess game) can be played by two players in the same time. 
+Also, the system will support chatting between different players.
 
 ## Outline Structure
-
-> Describe how you'll organize your code. What is the process and
-> supervision structure? If it uses a framework, how does it fit in. I
-> just need to understand the direction you plan to take. Again, three
-> or four sentences are probably enough.
-
-
-
-> replace all the ">" lines with your content, then push this to
-> github and issue a merge request.
+When two players decided to open a new game, the server will use a unique process to manage the game. 
+The process will receive messages from each player, process the message, and then send to the opponent.
+Also, the process can send announcement to two each play if necessary.
+This communication will be implemented by Websocket (Because it's a two way message sending)
+There is a supervisor to manage those processes.
+I will use <canvas> to implement game UI and use javascript to update UI.
