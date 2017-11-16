@@ -22,6 +22,9 @@ defmodule Joyfun.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+	  {:postgrex, ">=0.0.0"},
+      {:ecto, ">=0.0.0"},
+	  {:comeonin, "~> 2.0"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
     ]

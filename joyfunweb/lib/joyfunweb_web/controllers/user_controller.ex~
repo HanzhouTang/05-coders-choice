@@ -1,0 +1,8 @@
+defmodule JoyfunwebWeb.UserController do
+  use JoyfunwebWeb, :controller
+  alias JoyFun.User.Schema
+  def new(conn, _params) do
+    changeset = Schema.changeset(%Schema{},%{})
+    render conn, "new.html", changeset: changeset
+  end
+end

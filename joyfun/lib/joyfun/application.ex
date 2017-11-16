@@ -6,14 +6,11 @@ defmodule Joyfun.Application do
   use Application
 
   def start(_type, _args) do
-    # List all child processes to be supervised
+    import Supervisor.Spec
     children = [
-      # Starts a worker by calling: Joyfun.Worker.start_link(arg)
-      # {Joyfun.Worker, arg},
+     worker(JoyFun.Repo,[])
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Joyfun.Supervisor]
     Supervisor.start_link(children, opts)
   end
