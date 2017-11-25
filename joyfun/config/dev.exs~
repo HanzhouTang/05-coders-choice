@@ -1,0 +1,7 @@
+use Mix.Config
+config(:test, JoyFun.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "joyfun_#{Mix.env}",
+  username: "postgres",
+  password: nil,
+  hostname: "localhost")
