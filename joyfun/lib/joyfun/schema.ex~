@@ -1,0 +1,17 @@
+defmodule JoyFun.User.Schema do
+  use Ecto.Schema
+  import Ecto.Changeset
+  schema "users"  do
+    field :email,         :string
+    field :usernmane,     :string
+    field :password,      :string, virtual: true
+    field :password_hash, :string
+    timestamps()
+  end
+
+  def changeset(user, new_values) do
+    user
+    |> cast(new_values,[:email,:username,:password_hash])
+    |> validate_required([:email,:username,:password_hash])
+  end
+end

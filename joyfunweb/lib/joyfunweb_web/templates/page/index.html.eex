@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+<%= form_for @conn, page_path(@conn, :create_room), fn form -> %>
+<h2>Create a new Room</h2>
+<div class="form-group">
+<label>The numbers of Player</label>
+<%= select form, :player_number,["1 Player": 1,"2 Player": 2,"4 Player": 4], class: "form-control" %>
+</div>
+<div class="form-group">
+<label>Gaming Type</label>
+<%= select form, :game_type, ["painting": "painting"], class: "form-control" %>
+</div>
+<div class="form-group">
+<label> Password for the room</label>
+<%= password_input form, :password, placeholder: "Password", class: "form-control" %>
+</div>
+<%= submit "Create", class: "btn btn-primary" %>
+<% end %>
+</div>
+
+
+ <div class="col-sm-6">
+    <%= form_for @conn, page_path(@conn, :join_room), fn form -> %>
+    <h2> Join an existing room</h2>
+<div class="form-group">
+<label> Room Number</label>
+<%= text_input form, :room_number, placeholder: "Room Number", class: "form-control" %>
+</div>
+<div class="form-group">
+<label> Password for the room</label>
+<%= password_input form, :password, placeholder: "Password", class: "form-control" %>
+</div>
+<%= submit "Join", class: "btn btn-danger" %>
+<% end %>
+
+
+
+
+    </div>
+  </div>
+</div>
