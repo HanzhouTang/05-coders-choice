@@ -1,7 +1,8 @@
 import "phoenix_html"
 var $ = require('jquery');
 import loadView from './views/loader';
-
+//reference from https://blog.diacode.com/page-specific-javascript-in-phoenix-framework-pt-1
+// load different js module for different page
 function handleDOMContentLoaded() {
     // Get the current view name
     const viewName = document.getElementsByTagName('body')[0].dataset.jsViewName;

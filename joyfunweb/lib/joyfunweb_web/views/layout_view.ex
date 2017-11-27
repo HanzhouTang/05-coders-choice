@@ -1,3 +1,5 @@
+# reference from https://blog.diacode.com/page-specific-javascript-in-phoenix-framework-pt-1
+# generate  specific name for each page 
 defmodule JoyfunwebWeb.LayoutView do
   use JoyfunwebWeb, :view
    def js_view_name(conn, view_template) do
