@@ -16,11 +16,47 @@ export default class Painting extends Main {
     this.channel = this.join_channel();
     this.local = {};// the position when mouse down
     this.dragging = false; // if already pressed the mouse down
-    this.drawing = this.drawStraightLine;
+    this.tool = "straightLine";
     this.defaultFillStyle = "cornflowerblue";
     this.defaultStrokeStyle = "navy";
     this.defaultLineWidth = 0.5;
+    this.IsdrawGrid = false;
+    this.manageToolMove={};
+    this.manageToolUp={};
+
+    this.manageToolMove["straightLine"]={};
+    this.manageToolMove["straightLine"]["message"]="paint:StraightLineTemp";
+    this.manageToolMove["straightLine"]["func"]=null;
+    this.manageToolUp["straightLine"]={};
+    this.manageToolUp["straightLine"]["message"]="paint:StraightLineDone";
+    this.manageToolUp["straightLine"]["func"]=null;
+
+    this.manageToolMove["pencil"]={};
+    this.manageToolMove["pencil"]["message"]="paint:StraightLineDone";
+    this.manageToolMove["pencil"]["func"]=this.HandlePencilMove;
+    this.manageToolUp["pencil"]={};
+    this.manageToolUp["pencil"]["message"]="paint:StraightLineDone";
+    this.manageToolUp["pencil"]["func"]=null;
+
+    this.manageToolMove["circle"]={};
+    this.manageToolMove["circle"]["message"]="paint:CircleTemp";
+    this.manageToolMove["circle"]["func"]=null;
+    this.manageToolUp["circle"]={};
+    this.manageToolUp["circle"]["message"]="paint:CircleDone";
+    this.manageToolUp["circle"]["func"]=null;
+
+    this.manageToolMove["rectangle"]={};
+    this.manageToolMove["rectangle"]["message"]="paint:RectangleTemp";
+    this.manageToolMove["rectangle"]["func"]=null;
+    this.manageToolUp["rectangle"]={};
+    this.manageToolUp["rectangle"]["message"]="paint:RectangleDone";
+    this.manageToolUp["rectangle"]["func"]=null;
+
+
+
     this.setupEventHandlers(this.channel);
+    //this.drawCircle(this.context,{x:0,y:0},{x:100,y:100},this.defaultLineWidth,this.defaultStrokeStyle,this.defaultFillStyle);
+    //this.drawStraightLine(this.context,{x:0,y:0},{x:100,y:100},2.0,"black",this.defaultFillStyle);
   }
   
  setupEventHandlers(channel){
@@ -33,35 +69,49 @@ export default class Painting extends Main {
   this.SetupMouseMoveHandler(channel);
   this.SetupMouseUpHandler(channel);
   this.SetupChannelEventsHandler(channel);
+  this.SetupClearHandler(channel)
+  this.SetupToolsSelectHandler();
+  this.SetupColorSelectHandler();
  }
   
-  SetupMouseDownHandler(channel){ //need add channel later
-     let that= this;
-     this.canvas.onmousedown = function(e){
-          that.local=that.windowToCanvas(e.clientX, e.clientY);
-          e.preventDefault(); // prevent cursor change
-          that.dragging = true;
-     }
-  }
+  
 
   SetupChannelEventsHandler(channel){
     channel.on("echo", e =>{$("#board").append(e.message)});
     this.SetupChannelDrawGridHandler(channel);
     this.SetupChannelDrawStraightLineHandler(channel);
+    this.SetupChannelDrawCircleHandler(channel);
+    this.SetupChannelDrawRectangleHandler(channel);
   }
 
   SetupChannelDrawGridHandler(channel){
-    let drawGrid = this.drawGrid;
-    let canvas_width=this.canvas_width;
-    let canvas_height=this.canvas_height;
-    let context = this.context;
+    let that =this;
     channel.on("painting:Grid",e =>{
-      drawGrid(context, canvas_width,canvas_height,e.color, parseInt(e.stepx), parseInt(e.stepy));
+      
+      if(e.color!="#ffffff"){
+        
+        that.IsdrawGrid = true;
+        }
+      else{
+         that.IsdrawGrid = false;
+        }
+        that.restoreDrawingSurface()
     })
   }
 
 
-  //drawStraightLine(start,end,lineWidth,strokeStyle,fillStyle)
+  SetupToolsSelectHandler(){
+    let that =this;
+    $(".tools").click(
+      function(){
+          $(".tools").removeClass("btn-warning").addClass("btn-info");
+          that.tool =$(this).data("tool");
+          $(this).removeClass("btn-info").addClass("btn-warning");
+      }
+    )
+  }
+
+
   SetupChannelDrawStraightLineHandler(channel){
     let drawStraightLine = this.drawStraightLine;
     let canvas_width=this.canvas_width;
@@ -75,6 +125,7 @@ export default class Painting extends Main {
     channel.on("painting:StraightLineDone",e =>{
       doneJobs.push({action: "DrawStraightLine",start:{x: e.startX,y:e.startY},end:{x: e.endX,y: e.endY},strokeColor: e.color,fillColor: "black"});
       tempJobs["DrawStraightLine"] = null;
+      console.log("doneJobs size: "+ doneJobs.length);
       restoreDrawingSurface.call(that);
     })
                  
@@ -84,10 +135,92 @@ export default class Painting extends Main {
     }) // can get an effect if set temp to done
   }
 
+  SetupColorSelectHandler(){
+    let that = this;
+    $("#fillStyleSelect").change(
+      function(){
+        that.defaultFillStyle = $(this).val();
+      }
+    )
+    $("#strokeStyleSelect").change(
+      function(){
+        that.defaultStrokeStyle = $(this).val();
+      }
+    )
+  }
+
+  SetupClearHandler(channel){
+    let that =this;
+    $("#clear").click(
+      function(){
+        channel.push("Clear",{});
+      }
+    )
+    channel.on("Clear", e =>{
+      that.tempJobs["DrawStraightLine"] = null;
+      that.tempJobs["DrawCircle"] = null;
+      that.tempJobs["DrawRectangle"] = null;
+      that.doneJobs.splice(0,that.doneJobs.length);;
+      that.restoreDrawingSurface();
+    })
+  }
+
+  SetupChannelDrawCircleHandler(channel){
+    let drawStraightLine = this.drawStraightLine;
+    let canvas_width=this.canvas_width;
+    let canvas_height=this.canvas_height;
+    let context = this.context;
+    let defaultFillStyle = this.defaultFillStyle;
+    let doneJobs = this.doneJobs;//store finished painting
+    let tempJobs = this.tempJobs;//store temp painting
+    let restoreDrawingSurface= this.restoreDrawingSurface;
+    let that =this;
+    channel.on("painting:CircleDone",e =>{
+      doneJobs.push({action: "DrawCircle",start:{x: e.startX,y:e.startY},end:{x: e.endX,y: e.endY},strokeColor: e.color,fillColor: e.fillColor});
+      tempJobs["DrawCircle"] = null;
+      restoreDrawingSurface.call(that);
+    })
+                 
+    channel.on("painting:CircleTemp", e =>{
+      tempJobs["DrawCircle"] = {action: "DrawCircle",start:{x: e.startX,y:e.startY},end:{x: e.endX,y: e.endY},strokeColor: e.color,fillColor: e.fillColor};
+      restoreDrawingSurface.call(that);
+    }) // can get an effect if set temp to done
+  }
+
+
+  
+  SetupChannelDrawRectangleHandler(channel){
+    let drawStraightLine = this.drawStraightLine;
+    let canvas_width=this.canvas_width;
+    let canvas_height=this.canvas_height;
+    let context = this.context;
+    let defaultFillStyle = this.defaultFillStyle;
+    let doneJobs = this.doneJobs;//store finished painting
+    let tempJobs = this.tempJobs;//store temp painting
+    let restoreDrawingSurface= this.restoreDrawingSurface;
+    let that =this;
+    channel.on("painting:RectangleDone",e =>{
+      doneJobs.push({action: "DrawRectangle",start:{x: e.startX,y:e.startY},end:{x: e.endX,y: e.endY},strokeColor: e.color,fillColor: e.fillColor});
+      tempJobs["DrawRectangle"] = null;
+      restoreDrawingSurface.call(that);
+    })
+                 
+    channel.on("painting:RectangleTemp", e =>{
+      tempJobs["DrawRectangle"] = {action: "DrawRectangle",start:{x: e.startX,y:e.startY},end:{x: e.endX,y: e.endY},strokeColor: e.color,fillColor: e.fillColor};
+      restoreDrawingSurface.call(that);
+    }) // can get an effect if set temp to done
+  }
+
 
   TakeAction(command){
       if(command.action=="DrawStraightLine"){
         this.drawStraightLine(this.context,command.start,command.end,0.5,command.strokeColor,command.fillColor);
+      }
+      else if(command.action=="DrawCircle"){
+        this.drawCircle(this.context,command.start,command.end,0.5,command.strokeColor,command.fillColor);
+      }
+      else if(command.action=="DrawRectangle"){
+        this.drawRectangle(this.context,command.start,command.end,0.5,command.strokeColor,command.fillColor);
       }
   }
 
@@ -98,22 +231,46 @@ export default class Painting extends Main {
     let canvas_width = this.canvas_width;
     let canvas_height = this.canvas_height;
     context.clearRect(0, 0, canvas_width, canvas_height);
-    console.log(doneJobs.length);
+    console.log("length: "+ doneJobs.length);
+    if(this.IsdrawGrid){
+    this.drawGrid(context, canvas_width,canvas_height,'lightgray', 10, 10);}
     for (let command of doneJobs){
       this.TakeAction(command);
     }
+    
     if(tempJobs["DrawStraightLine"])
     this.TakeAction(tempJobs["DrawStraightLine"]);
+    if(tempJobs["DrawCircle"])
+    this.TakeAction(tempJobs["DrawCircle"]);
+    if(tempJobs["DrawRectangle"])
+    this.TakeAction(tempJobs["DrawRectangle"]);
     
  }
+
+
+  HandlePencilMove(loc){
+    this.local = loc;
+  }
+
+  SetupMouseDownHandler(channel){ 
+     let that= this;
+     this.canvas.onmousedown = function(e){
+          that.local=that.windowToCanvas(e.clientX, e.clientY);
+          e.preventDefault(); // prevent cursor change
+          that.dragging = true;
+     }
+  }
 
   SetupMouseMoveHandler(channel){
     let that =this;
     this.canvas.onmousemove = function(e){
+      let message = that.manageToolMove[that.tool]["message"];
+      let func = that.manageToolMove[that.tool]["func"];
       if (that.dragging) {
           e.preventDefault(); // prevent selections
           let loc = that.windowToCanvas(e.clientX, e.clientY);
-          channel.push("paint:straightLineTemp",{color: that.defaultStrokeStyle,startX: that.local.x,startY: that.local.y,endX: loc.x,endY: loc.y});
+          channel.push(message,{color: that.defaultStrokeStyle,startX: that.local.x,startY: that.local.y,endX: loc.x,endY: loc.y,fillColor: that.defaultFillStyle});
+          if(func) {func.call(that,loc);}
       }
     }
   }
@@ -121,9 +278,13 @@ export default class Painting extends Main {
   SetupMouseUpHandler(channel){
     let that = this;
     this.canvas.onmouseup = function(e){
+      let message = that.manageToolUp[that.tool]["message"];
+      let func = that.manageToolUp[that.tool]["func"];
       let loc = that.windowToCanvas(e.clientX, e.clientY);
-      channel.push("paint:straightLineDone",{color: that.defaultStrokeStyle,startX: that.local.x,startY: that.local.y,endX: loc.x,endY: loc.y});
+      channel.push(message,{color: that.defaultStrokeStyle,startX: that.local.x,startY: that.local.y,
+        endX: loc.x,endY: loc.y,fillColor: that.defaultFillStyle});
       that.dragging = false;
+      if(func){func.call(that,loc);}
     }
   }
 
@@ -159,6 +320,8 @@ export default class Painting extends Main {
     return channel;
   }
   
+
+  
   windowToCanvas(x,y){
     let canvas = this.canvas;
     let bbox = canvas.getBoundingClientRect();
@@ -186,6 +349,35 @@ export default class Painting extends Main {
     }
  }
 
+ drawCircle(context,start,end,lineWidth,strokeStyle,fillStyle){
+  context.save();
+  context.fillStyle=fillStyle;
+  context.strokeStyle = strokeStyle;
+  context.lineWidth=lineWidth
+  let radius = Math.sqrt((start.x-end.x)*(start.x-end.x)+(start.y-end.y)*(start.y-end.y));
+  context.beginPath();
+  context.arc(start.x, start.y, radius, 0, Math.PI*2, false); 
+  context.stroke();
+  context.fill();
+  context.restore();
+ }
+
+ drawRectangle(context,start,end,lineWidth,strokeStyle,fillStyle){
+  context.save();
+  context.fillStyle=fillStyle;
+  context.strokeStyle = strokeStyle;
+  context.lineWidth=lineWidth
+  let width = Math.abs(start.x-end.x);
+  let height = Math.abs(start.y-end.y);
+  let temp ={};
+  temp.x = Math.min(start.x,end.x);
+  temp.y = Math.min(start.y,end.y);
+  context.strokeRect(temp.x, temp.y,width, height);
+  context.fillRect(temp.x, temp.y, width, height);
+  context.restore();
+ }
+
+
  drawStraightLine(context,start,end,lineWidth,strokeStyle,fillStyle) {
   context.save();
   context.fillStyle=fillStyle;
@@ -207,7 +399,7 @@ export default class Painting extends Main {
     super.unmount();
   }
   static my_logger(kind,msg,data){
-    console.log("Socket event: "+ kind+":"+msg,data);
+   // console.log("Socket event: "+ kind+":"+msg,data);
   }
 
   

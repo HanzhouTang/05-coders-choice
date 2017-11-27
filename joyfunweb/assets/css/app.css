@@ -33,3 +33,11 @@
      position: relative;
      left: -300px;
  }
+ .tools{
+     margin-top: 10px;
+ }
+
+ #clear{
+     margin-top: 10px;
+     margin-bottom: 10px;
+ }

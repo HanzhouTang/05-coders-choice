@@ -3,7 +3,41 @@
 <div class="reposition">
 <div class="container-fluid">
      <section class="col-sm-2" style="text-align:center;">
+          <div class="form-group">
+                     <label>Stroke Color</label>
+                     <select id='strokeStyleSelect' class="form-control">
+                        <option value='red'>red</option>
+                        <option value='green'>green</option>
+                        <option value='blue'>blue</option>
+                        <option value='orange'>orange</option>
+                        <option value='cornflowerblue'>cornflowerblue</option>
+                        <option value='goldenrod'>goldenrod</option>
+                        <option value='navy' selected>navy</option>
+                        <option value='purple'>purple</option>
+                        <option value='purple'>purple</option>
+                     </select>
+         </div>
+          <div class="form-group">
+                     <label>Fill Color</label>
+                     <select id='fillStyleSelect' class="form-control">
+                        <option value='red'>red</option>
+                        <option value='green'>green</option>
+                        <option value='blue'>blue</option>
+                        <option value='orange'>orange</option>
+                        <option value='cornflowerblue' selected>cornflowerblue</option>
+                        <option value='goldenrod'>goldenrod</option>
+                        <option value='navy' >navy</option>
+                        <option value='purple'>purple</option>
+                        <option value='purple'>purple</option>
+                     </select>
+         </div>
+         <button class="btn btn-default" id="clear"> Clear All</button>
          <button class="btn btn-info" id="draw_grid"> DrawGrid </button>
+         <button class="btn btn-info tools" id="straightLine" data-tool="straightLine"> StraightLine </button>
+         <button class="btn btn-info tools" id="pencil" data-tool="pencil"> Pencil </button>
+         <button class="btn btn-info tools" id="circle" data-tool="circle">Circle  </button>
+         <button class="btn btn-info tools" id="rectangle" data-tool="rectangle">Rectangle  </button>
+         
      </section>
      <section class="col-sm-6" style="text-align:center;">
          <canvas id='canvas' width='650' height='450'>

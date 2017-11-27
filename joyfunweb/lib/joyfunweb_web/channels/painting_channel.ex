@@ -15,13 +15,18 @@ defmodule JoyfunwebWeb.PaintingChannel do
     {:noreply, socket}
   end
 
-  def handle_in("paint:straightLine"<>type,%{"color" => color,"startX" =>startX, "startY" =>startY,"endX"=>endX,"endY"=>endY },socket) do
-    broadcast! socket, "painting:StraightLine"<>type, %{color: color, startX: startX, startY: startY,endX: endX, endY: endY,LineWidth: 0.5 }
+  def handle_in("paint:clearGrid",_msg,socket) do
+    broadcast! socket, "painting:Grid", %{color: "#ffffff", stepx: 10, stepy: 10}
     {:noreply, socket}
   end
 
-  def handle_in("paint:clearGrid",_msg,socket) do
-    broadcast! socket, "painting:Grid", %{color: "#ffffff", stepx: 10, stepy: 10}
+  def handle_in("paint:"<>type,%{"color" => color,"startX" =>startX, "startY" =>startY,"endX"=>endX,"endY"=>endY, "fillColor" =>fillColor },socket) do
+    broadcast! socket, "painting:"<>type, %{color: color, startX: startX, startY: startY,endX: endX, endY: endY,LineWidth: 0.5,fillColor: fillColor }
+    {:noreply, socket}
+  end
+
+  def handle_in(msg,_msg,socket) do
+    broadcast! socket, msg, %{}
     {:noreply, socket}
   end
 
