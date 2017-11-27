@@ -16,9 +16,14 @@ defmodule JoyfunwebWeb.Router do
 
   scope "/", JoyfunwebWeb do
     pipe_through :browser # Use the default browser stack
-
+    get "/user/logout", UserController, :logout, as: :user
+    get "/user/login", UserController, :login, as: :user
+    post "/user/verfication", UserController, :verfication, as: :user
+    post "/create_room", PageController, :create_room 
+    post "/join_room", PageController, :join_room
+    get "/painting", PageController, :painting 
     get "/", PageController, :index
-    resources "/user", UserController, only: [:index, :show, :create, :new]
+    resources "/user", UserController, only: [:index, :create]
   end
 
   # Other scopes may use custom stacks.

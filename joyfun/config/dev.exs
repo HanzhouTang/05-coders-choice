@@ -3,5 +3,5 @@ config(:joyfun, JoyFun.Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "joyfun_#{Mix.env}",
   username: "postgres",
-  password: nil,
+  password: "mnhg1234",
   hostname: "localhost")

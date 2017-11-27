@@ -11,4 +11,17 @@ defmodule JoyFun.Impl do
     from(user in Schema, where: [id: ^id])
     |> JoyFun.Repo.one
   end
+  
+  def verfication(username, password) do 
+    user = from(user in Schema, where: [username: ^username])
+    |> JoyFun.Repo.one
+    cond do
+      user && Comeonin.Bcrypt.checkpw(password, user.password_hash) ->
+	{:ok,user}
+      user ->
+	:error_password
+      true ->
+	:error_username
+    end
+  end
 end

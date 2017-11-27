@@ -1,0 +1,23 @@
+
+<h1 id="room_number" data-room-number=<%= @room_number %>  data-user-name=<%= @user_name %> > Joy Painting </h1>
+<div class="reposition">
+<div class="container-fluid">
+     <section class="col-sm-2" style="text-align:center;">
+         <button class="btn btn-info" id="draw_grid"> DrawGrid </button>
+     </section>
+     <section class="col-sm-6" style="text-align:center;">
+         <canvas id='canvas' width='650' height='450'>
+            Canvas not supported
+         </canvas>
+     </section>
+     
+     <section class="col-sm-4" id ="chatting_component">
+         <div id="board">
+         </div>
+         <div class="form-group">
+           <input type="text" placeholder="..." class="form-control" id = "chatting_input"/>
+           <button class="btn btn-primary" id="sending"> Sending </button>
+         </div>
+     </section>
+</div>
+</div>

@@ -1,36 +1,42 @@
-<div class="jumbotron">
-  <h2><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h2>
-  <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+<%= form_for @conn, page_path(@conn, :create_room), fn form -> %>
+<h2>Create a new Room</h2>
+<div class="form-group">
+<label>The numbers of Player</label>
+<%= select form, :player_number,["1 Player": 1,"2 Player": 2,"4 Player": 4], class: "form-control" %>
+</div>
+<div class="form-group">
+<label>Gaming Type</label>
+<%= select form, :game_type, ["painting": "painting"], class: "form-control" %>
+</div>
+<div class="form-group">
+<label> Password for the room</label>
+<%= password_input form, :password, placeholder: "Password", class: "form-control" %>
+</div>
+<%= submit "Create", class: "btn btn-primary" %>
+<% end %>
 </div>
 
-<div class="row marketing">
-  <div class="col-lg-6">
-    <h4>Resources</h4>
-    <ul>
-      <li>
-        <a href="http://phoenixframework.org/docs/overview">Guides</a>
-      </li>
-      <li>
-        <a href="https://hexdocs.pm/phoenix">Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-    </ul>
-  </div>
 
-  <div class="col-lg-6">
-    <h4>Help</h4>
-    <ul>
-      <li>
-        <a href="http://groups.google.com/group/phoenix-talk">Mailing list</a>
-      </li>
-      <li>
-        <a href="http://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">@elixirphoenix</a>
-      </li>
-    </ul>
+ <div class="col-sm-6">
+    <%= form_for @conn, page_path(@conn, :join_room), fn form -> %>
+    <h2> Join an existing room</h2>
+<div class="form-group">
+<label> Room Number</label>
+<%= text_input form, :room_number, placeholder: "Room Number", class: "form-control" %>
+</div>
+<div class="form-group">
+<label> Password for the room</label>
+<%= password_input form, :password, placeholder: "Password", class: "form-control" %>
+</div>
+<%= submit "Join", class: "btn btn-danger" %>
+<% end %>
+
+
+
+
+    </div>
   </div>
 </div>

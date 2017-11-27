@@ -2,7 +2,7 @@ defmodule JoyfunwebWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", JoyfunwebWeb.RoomChannel
+  channel "painting:*", JoyfunwebWeb.PaintingChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

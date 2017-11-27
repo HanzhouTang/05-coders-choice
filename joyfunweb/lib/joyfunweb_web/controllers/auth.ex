@@ -15,4 +15,14 @@ defmodule JoyfunwebWeb.Auth do
     |> put_session(:user_id, user.id)
     |> configure_session(renew: true)
   end
+
+  def logout(conn) do
+    room_number = get_session(conn,:room_number)
+    user_id = get_session(conn,:user_id)
+    if room_number do 
+    Joyfunserver.removePlayer(room_number,user_id)
+    end
+    configure_session(conn, drop: true)
+  end 
+  
 end
